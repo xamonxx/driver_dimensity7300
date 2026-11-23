@@ -7,3 +7,5 @@ build/
 .zb_*
 debugimg/
 DEVICE_INFO (1).md
+log/
+imgdebug/
