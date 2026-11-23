@@ -15,6 +15,8 @@ dipakai di launcher GTA V. Target owner: **FPS 30–60 yang sangat stabil**, suh
 - **V0.1 RILIS** (CI 45212424366, setelah fix header xcb): release `v0.1` berisi 4 zip + SHA256SUMS.txt. Audit lokal PASS.
   Catatan rilis memakai `docs/RELEASE_NOTES.md`. Status driver: **NOT TESTED** di HP.
 
+- **V0.1 FORCE CLOSE** di launcher GTA V (laporan owner 2026-11-24). **V0.2** dibangun: profil MC2 (IR off, heap 10,400) + varian safe30.
+
 ## Next steps
 1. Owner uji sesuai `docs/TESTING.md` (bawaan vs stable30 vs stable60).
 2. V0.2 berdasarkan hasil uji (mis. cap 40/45, atau fallback kandidat #2 JimVulkan bila #1 gagal load).
