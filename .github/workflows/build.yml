@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [stable30, stable60, safe30]
+        variant: [stable30, stable60, safe30, debug30]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,7 +53,7 @@ jobs:
       - name: Build (upstream flags fallback)
         if: steps.tuned.outcome == 'failure'
         run: |
-          rm -rf dist/*.zip work/zb/build work/zb/dist
+          rm -rf dist/*.zip dist/symbols work/zb/build work/zb/dist
           VARIANT=${{ matrix.variant }} TUNE=0 bash build_mali7300.sh
 
       - name: Summary
@@ -66,6 +66,15 @@ jobs:
           name: xamonxx_mali7300V${{ env.VERSION }}-${{ matrix.variant }}
           path: dist/*.zip
           if-no-files-found: error
+
+      - name: Upload unstripped library (debug30 only, for crash offset symbolization)
+        if: matrix.variant == 'debug30'
+        uses: actions/upload-artifact@v4
+        with:
+          name: symbols-${{ matrix.variant }}
+          path: dist/symbols/
+          if-no-files-found: warn
+          retention-days: 90
 
   release:
     needs: build

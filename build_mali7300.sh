@@ -16,12 +16,14 @@ VARIANT="${VARIANT:-stable30}"
 # PROFILE (patches/xamonxx/0002_device_profile.py):
 #   1 = G615 MC2 fixes (kbase incremental rendering off, tiler heap 10,400; zenithblue#54)
 #   2 = 1 + plain present/sync paths (no Android present thread, CPU semaphore waits)
+DIAG=0
 case "$VARIANT" in
     stable30) FPS_CAP=30; PROFILE=1 ;;
     stable60) FPS_CAP=60; PROFILE=1 ;;
     safe30)   FPS_CAP=30; PROFILE=2 ;;
+    debug30)  FPS_CAP=30; PROFILE=1; DIAG=1 ;;   # stable30 + on-device crash/Mesa logs
     nocap)    FPS_CAP=0;  PROFILE=1 ;;
-    *) echo "Unknown VARIANT=$VARIANT (stable30|stable60|safe30|nocap)" >&2; exit 1 ;;
+    *) echo "Unknown VARIANT=$VARIANT (stable30|stable60|safe30|debug30|nocap)" >&2; exit 1 ;;
 esac
 TUNE="${TUNE:-1}"   # 1 = A78/A55 tuning, 0 = upstream flags (fallback)
 
@@ -79,6 +81,7 @@ prepare_tree() {
     log "Applying xamonxx patches"
     (cd "$MESA" && python3 -B "$ROOT/patches/xamonxx/0001_frame_pacer.py")
     (cd "$MESA" && python3 -B "$ROOT/patches/xamonxx/0002_device_profile.py")
+    (cd "$MESA" && python3 -B "$ROOT/patches/xamonxx/0003_diagnostics.py")
     grep -q "xamonxx_frame_pace" "$MESA/src/panfrost/vulkan/panvk_wsi.c" || die "frame pacer patch missing"
     grep -q "xamonxx_profile_default" "$MESA/src/util/os_misc.c" || die "device profile patch missing"
 }
@@ -87,6 +90,9 @@ inject_flags() {
     # build-android.sh / build-android-deps.sh derive their cross files from this template.
     local ini="$ZB/meson/android-aarch64.ini"
     local args="'-DXAMONXX_FPS_CAP=$FPS_CAP', '-DXAMONXX_PROFILE=$PROFILE'"
+    if [ "$DIAG" = 1 ]; then
+        args="$args, '-DXAMONXX_DIAG=1'"
+    fi
     if [ "$TUNE" = 1 ]; then
         args="$args, '-march=armv8.2-a+crypto+dotprod+fp16+rcpc', '-mtune=cortex-a78'"
     fi
@@ -104,6 +110,17 @@ build_driver() {
     [ -f "$SO" ] || die "libvulkan_panfrost.so not produced"
     grep -aq "xamonxx mali7300: frame pacer" "$SO" || die "frame pacer not linked into the driver"
     grep -aq "10,400" "$SO" || die "device profile (heap 10,400) not linked into the driver"
+    if [ "$DIAG" = 1 ]; then
+        grep -aq "xamonxx_mali7300_crash.log" "$SO" || die "diagnostics not linked into the driver"
+        # Unstripped copy (same code layout) to map crash offsets to function names.
+        local unstripped="$ZB/build/android-bionic/src/panfrost/vulkan/libvulkan_panfrost.so"
+        mkdir -p "$DIST/symbols"
+        if [ -f "$unstripped" ]; then
+            cp "$unstripped" "$DIST/symbols/libvulkan_panfrost-${VARIANT}-unstripped.so"
+        else
+            log "unstripped library not found at $unstripped (symbols unavailable)"
+        fi
+    fi
     if [ "$PROFILE" -ge 2 ]; then
         grep -aq "PANVK_ANDROID_PRESENT_THREAD" "$SO" || die "safe profile table missing"
     fi
@@ -127,19 +144,22 @@ package() {
         rm -rf "$stage"; mkdir -p "$stage"
         cp "$SO" "$stage/$lib"
         cp "$WORK/NOTICE.txt" "$stage/NOTICE.txt"
-        python3 - "$stage/meta.json" "$name" "$VERSION-$VARIANT" "$mesa_sha" "$FPS_CAP" "$TUNE" "$lib" "$PROFILE" <<'PY'
+        python3 - "$stage/meta.json" "$name" "$VERSION-$VARIANT" "$mesa_sha" "$FPS_CAP" "$TUNE" "$lib" "$PROFILE" "$DIAG" <<'PY'
 import json, sys
-out, name, ver, sha, cap, tune, lib, profile = sys.argv[1:]
+out, name, ver, sha, cap, tune, lib, profile = sys.argv[1:9]
 cap = int(cap)
 pacer = f"frame pacer {cap} fps" if cap else "no frame cap"
 cpu = "A78/A55 tuned" if tune == "1" else "upstream flags"
+diag = sys.argv[9] == "1"
 prof = {"1": "MC2 profile (tiler IR off, heap 10,400)",
         "2": "MC2 safe profile (tiler IR off, heap 10,400, no present thread, CPU semaphore waits)"}[profile]
 meta = {
     "schemaVersion": 1,
     "name": name,
     "description": ("Mesa PanVK on mali_kbase for Mali-G615 MC2 (Infinix Note 50X, Dimensity 7300). "
-                    f"zenithblue v26.3.1 series p0175 + xamonxx {pacer}, {prof}, {cpu}. Mesa {sha}."),
+                    f"zenithblue v26.3.1 series p0175 + xamonxx {pacer}, {prof}, {cpu}"
+                    + (", DIAGNOSTICS: logs to /sdcard/Android/media/<app>/xamonxx_mali7300_*.log" if diag else "")
+                    + f". Mesa {sha}."),
     "author": "xamonxx",
     "packageVersion": ver,
     "vendor": "Mesa",

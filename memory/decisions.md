@@ -5,6 +5,14 @@ updated: 2026-11-23
 type: decision
 ---
 
+### 2026-11-24: Diagnostik on-device (patch xamonxx/0003, varian debug30)
+- **Konteks:** owner: force close terjadi "saat membuka game". Tidak ada akses logcat/ADB.
+- **Keputusan:** dengan `-DXAMONXX_DIAG`, constructor driver menulis header ke
+  `/sdcard/Android/media/<pkg>/xamonxx_mali7300_crash.log` dan memasang handler SIGSEGV/SIGBUS/SIGILL/SIGFPE/SIGABRT/SIGTRAP
+  (write() saja; PC/LR/SP/FP + offset driver + fp-walk; handler lama dipulihkan lalu fault berulang).
+  Log Mesa lewat default `MESA_LOG_FILE`/`MESA_LOG_LEVEL=info` di tabel 0002. `.so` unstripped diunggah sebagai artifact
+  CI `symbols-debug30`, lalu dibaca `tools/symbolize_crash.py`.
+
 ### 2026-11-24: V0.2, profil perangkat MC2 (patch xamonxx/0002)
 - **Konteks:** V0.1 force close. Riset issue zenithblue: #20 (HP **sama**, X6857/MT6878, SIGSEGV 0x518 di
   vkCreateSemaphore pada build RC2/RC3 LukeValen. Jalur sync kbase v26.3.1 sudah ditulis ulang, CPU sync tanpa objek kernel)
