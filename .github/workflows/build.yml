@@ -1,0 +1,90 @@
+name: Build xamonxx mali7300 driver
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - build_mali7300.sh
+      - patches/**
+      - tools/audit_mali_driver.py
+      - .github/workflows/build.yml
+
+permissions:
+  contents: write
+
+env:
+  VERSION: "0.1"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [stable30, stable60]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config bison flex glslang-tools zip unzip curl git \
+            python3-pip python3-mako python3-yaml python3-packaging python3-ply \
+            llvm-18-dev libclang-18-dev libclang-cpp18-dev clang-18 libclc-18-dev \
+            libllvmspirvlib-18-dev llvm-spirv-18 spirv-tools \
+            libdrm-dev zlib1g-dev libexpat1-dev libelf-dev \
+            libxcb1-dev libx11-dev libx11-xcb-dev libxshmfence-dev
+          pip3 install --break-system-packages "meson>=1.4,<1.9"
+          echo "/usr/lib/llvm-18/bin" >> "$GITHUB_PATH"
+
+      - name: Build (A78/A55 tuned)
+        id: tuned
+        continue-on-error: true
+        run: VARIANT=${{ matrix.variant }} TUNE=1 bash build_mali7300.sh
+
+      - name: Build (upstream flags fallback)
+        if: steps.tuned.outcome == 'failure'
+        run: |
+          rm -rf dist/*.zip work/zb/build work/zb/dist
+          VARIANT=${{ matrix.variant }} TUNE=0 bash build_mali7300.sh
+
+      - name: Summary
+        run: |
+          echo "### ${{ matrix.variant }} (tuned build: ${{ steps.tuned.outcome }})" >> "$GITHUB_STEP_SUMMARY"
+          ( cd dist && sha256sum *.zip ) | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xamonxx_mali7300V${{ env.VERSION }}-${{ matrix.variant }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+
+      - name: Publish release v${{ env.VERSION }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -l out
+          ( cd out && sha256sum *.zip > SHA256SUMS.txt )
+          gh release delete "v${VERSION}" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "v${VERSION}" out/*.zip out/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "xamonxx mali7300 V${VERSION}" \
+            --notes "Mesa PanVK on mali_kbase for Mali-G615 MC2 (Infinix Note 50X / Dimensity 7300).
+          Base: zenithblue panvk-kbase v26.3.1 series (p0175). Added: precise frame pacer + A78/A55 tuning.
+          - stable30: frame pacer 30 fps (recommended for GTA V)
+          - stable60: frame pacer 60 fps
+          - *-freedreno.zip: same driver named libvulkan_freedreno.so for loaders that require that name
+          Runtime override: XAMONXX_FPS_CAP=0|10..240. EXPERIMENTAL, NOT TESTED on Mali-G615 MC2 yet."
