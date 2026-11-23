@@ -38,7 +38,10 @@ jobs:
             llvm-18-dev libclang-18-dev libclang-cpp18-dev clang-18 libclc-18-dev \
             libllvmspirvlib-18-dev llvm-spirv-18 spirv-tools \
             libdrm-dev zlib1g-dev libexpat1-dev libelf-dev \
-            libxcb1-dev libx11-dev libx11-xcb-dev libxshmfence-dev
+            libxcb1-dev libx11-dev libx11-xcb-dev libxshmfence-dev \
+            libxcb-shm0-dev libxcb-randr0-dev libxcb-dri3-dev libxcb-dri2-0-dev \
+            libxcb-present-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-glx0-dev \
+            libxext-dev libxfixes-dev libxrandr-dev libxxf86vm-dev
           pip3 install --break-system-packages "meson>=1.4,<1.9"
           echo "/usr/lib/llvm-18/bin" >> "$GITHUB_PATH"
 
