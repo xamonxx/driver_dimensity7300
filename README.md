@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ xamonxx mali7300
+#  xamonxx mali7300
 
 ### Driver Vulkan open-source untuk **Mali-G615 MC2** · Infinix Note 50X 5G
 
