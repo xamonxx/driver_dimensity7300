@@ -5,6 +5,13 @@ updated: 2026-11-23
 type: decision
 ---
 
+### 2026-11-24: V0.3, cari dma-buf yang benar di handle ANB (patch xamonxx/0004)
+- **Konteks:** log launcher menunjukkan swapchain gagal di `vk_android_import_anb_memory` (`data[0]` bukan dma-buf).
+- **Keputusan:** iterasi `handle->data[]`, lalu fstat, lseek size>0, GetMemoryFdProperties OK. Pass 0 mensyaratkan size ≥ mem_reqs.size,
+  pass 1 tanpa syarat ukuran (AFBC gralloc bisa beda ukuran). `data[0]` tetap kandidat pertama.
+- **Sumber pola:** `panvk_android_find_dma_buf_fd()` dan probe AHB di tree basis ("Arm gralloc4 handles do not always put the dma-buf at data[0]").
+- **Risiko lanjutan:** import buffer AFBC dari gralloc MediaTek belum terbukti. Uji di perangkat.
+
 ### 2026-11-24: Diagnostik on-device (patch xamonxx/0003, varian debug30)
 - **Konteks:** owner: force close terjadi "saat membuka game". Tidak ada akses logcat/ADB.
 - **Keputusan:** dengan `-DXAMONXX_DIAG`, constructor driver menulis header ke

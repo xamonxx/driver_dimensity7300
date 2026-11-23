@@ -11,7 +11,7 @@
 # Output: dist/xamonxx_mali7300V<ver>-<variant>.zip and ...-<variant>-freedreno.zip
 set -euo pipefail
 
-VERSION="0.2"
+VERSION="0.3"
 VARIANT="${VARIANT:-stable30}"
 # PROFILE (patches/xamonxx/0002_device_profile.py):
 #   1 = G615 MC2 fixes (kbase incremental rendering off, tiler heap 10,400; zenithblue#54)
@@ -82,6 +82,8 @@ prepare_tree() {
     (cd "$MESA" && python3 -B "$ROOT/patches/xamonxx/0001_frame_pacer.py")
     (cd "$MESA" && python3 -B "$ROOT/patches/xamonxx/0002_device_profile.py")
     (cd "$MESA" && python3 -B "$ROOT/patches/xamonxx/0003_diagnostics.py")
+    (cd "$MESA" && python3 -B "$ROOT/patches/xamonxx/0004_anb_dmabuf_fd.py")
+    grep -q "xamonxx_anb_find_dma_buf" "$MESA/src/vulkan/runtime/vk_android.c" || die "anb dma-buf patch missing"
     grep -q "xamonxx_frame_pace" "$MESA/src/panfrost/vulkan/panvk_wsi.c" || die "frame pacer patch missing"
     grep -q "xamonxx_profile_default" "$MESA/src/util/os_misc.c" || die "device profile patch missing"
 }

@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ xamonxx mali7300 · V0.2
+# ⚡ xamonxx mali7300 · V0.3
 
 **Driver Vulkan Mesa PanVK untuk Mali-G615 MC2 · Infinix Note 50X 5G (Dimensity 7300)**
 
@@ -14,7 +14,14 @@
 
 ---
 
-## 🆕 Apa yang baru di V0.2
+## 🆕 Apa yang baru di V0.3
+- 🩹 **FIX force close saat game dibuka** (patch `xamonxx/0004`). Dari log crash launcher GTA V:
+  `GetMemoryFdPropertiesKHR failed` lalu `vkCreateSwapchainKHR ... VkResult -1000072003` (INVALID_EXTERNAL_HANDLE).
+  Driver mengambil `data[0]` dari handle gralloc sebagai dma-buf layar, padahal di gralloc Mali/MediaTek dma-buf
+  **tidak selalu** di posisi itu. Sekarang driver mencari dma-buf yang benar di semua fd handle (aturan yang sama dengan
+  jalur AHB yang sudah ada di driver basis).
+
+## Dari V0.2 (tetap ada)
 - 🩹 **Profil perangkat MC2 tertanam** (patch `xamonxx/0002`): *incremental rendering* kbase **dimatikan** dan tiler heap
   **10 awal / 400 maks chunk**. Ini perbaikan yang sudah terverifikasi untuk G615 **MC2** yang kehilangan GPU
   di v26.3.1 ([zenithblue#54](https://github.com/zenithblue-oss/panvk-kbase-android/issues/54)).
@@ -30,11 +37,11 @@
 
 | Situasi | Download ini |
 |---|---|
-| 🎮 **GTA V, coba pertama** | **`xamonxx_mali7300V0.2-stable30.zip`** ⭐ |
-| 💥 `stable30` **force close** | `xamonxx_mali7300V0.2-safe30.zip` |
+| 🎮 **GTA V, coba pertama** | **`xamonxx_mali7300V0.3-stable30.zip`** ⭐ |
+| 💥 `stable30` **force close** | `xamonxx_mali7300V0.3-safe30.zip` |
 | 💥 Masih force close | versi `-freedreno.zip` dari varian yang sama |
-| 🔬 **Semua force close** | **`xamonxx_mali7300V0.2-debug30.zip`**, lalu kirim file log-nya (lihat bawah) |
-| 🏃 Game ringan, mau lebih mulus | `xamonxx_mali7300V0.2-stable60.zip` |
+| 🔬 **Semua force close** | **`xamonxx_mali7300V0.3-debug30.zip`**, lalu kirim file log-nya (lihat bawah) |
+| 🏃 Game ringan, mau lebih mulus | `xamonxx_mali7300V0.3-stable60.zip` |
 | 🎯 GameHub / BannerHub | `…-freedreno.zip` |
 
 > [!IMPORTANT]
@@ -42,7 +49,7 @@
 > Catat **kapan** force close terjadi (saat import zip, saat memilih driver, atau saat game mulai) dan laporkan di Issues.
 
 ## 🔬 Cara mengambil log (varian debug30)
-1. Import dan pilih **xamonxx mali7300 V0.2 Debug30**, lalu buka game sampai force close.
+1. Import dan pilih **xamonxx mali7300 V0.3 Debug30**, lalu buka game sampai force close.
 2. Buka file manager, masuk ke **Internal storage → Android → media →** folder bernama paket launcher GTA V
    (bila tidak ada, cek **Download**).
 3. Kirim dua file: `xamonxx_mali7300_crash.log` dan `xamonxx_mali7300_mesa.log`.
@@ -51,23 +58,23 @@
 
 ## 🚀 Cara pasang (launcher GTA V)
 1. Download zip, **jangan di-extract**.
-2. Hapus driver V0.1 lama: **Remove a driver**.
-3. **Settings → Import driver (.zip)** lalu pilih zip V0.2.
-4. Pilih **xamonxx mali7300 V0.2 Stable30** (atau Safe30) di Vulkan Driver.
+2. Hapus driver lama (V0.1/V0.2): **Remove a driver**.
+3. **Settings → Import driver (.zip)** lalu pilih zip V0.3.
+4. Pilih **xamonxx mali7300 V0.3 Stable30** (atau Safe30) di Vulkan Driver.
 5. Command line: **Profil A** ([`docs/COMMANDLINE.md`](https://github.com/xamonxx/driver_dimensity7300/blob/master/docs/COMMANDLINE.md)), resolusi 1066×480, Target FPS 30.
 6. Jalankan **Benchmark Runs**, lalu kirim screenshot.
 
 ## 📁 Daftar file
 | File | Pacer | Profil | Library |
 |---|:-:|---|---|
-| `xamonxx_mali7300V0.2-stable30.zip` | 30 | MC2 | `libvulkan_panfrost.so` |
-| `xamonxx_mali7300V0.2-stable30-freedreno.zip` | 30 | MC2 | `libvulkan_freedreno.so` |
-| `xamonxx_mali7300V0.2-safe30.zip` | 30 | MC2 safe | `libvulkan_panfrost.so` |
-| `xamonxx_mali7300V0.2-safe30-freedreno.zip` | 30 | MC2 safe | `libvulkan_freedreno.so` |
-| `xamonxx_mali7300V0.2-debug30.zip` | 30 | MC2 + log | `libvulkan_panfrost.so` |
-| `xamonxx_mali7300V0.2-debug30-freedreno.zip` | 30 | MC2 + log | `libvulkan_freedreno.so` |
-| `xamonxx_mali7300V0.2-stable60.zip` | 60 | MC2 | `libvulkan_panfrost.so` |
-| `xamonxx_mali7300V0.2-stable60-freedreno.zip` | 60 | MC2 | `libvulkan_freedreno.so` |
+| `xamonxx_mali7300V0.3-stable30.zip` | 30 | MC2 | `libvulkan_panfrost.so` |
+| `xamonxx_mali7300V0.3-stable30-freedreno.zip` | 30 | MC2 | `libvulkan_freedreno.so` |
+| `xamonxx_mali7300V0.3-safe30.zip` | 30 | MC2 safe | `libvulkan_panfrost.so` |
+| `xamonxx_mali7300V0.3-safe30-freedreno.zip` | 30 | MC2 safe | `libvulkan_freedreno.so` |
+| `xamonxx_mali7300V0.3-debug30.zip` | 30 | MC2 + log | `libvulkan_panfrost.so` |
+| `xamonxx_mali7300V0.3-debug30-freedreno.zip` | 30 | MC2 + log | `libvulkan_freedreno.so` |
+| `xamonxx_mali7300V0.3-stable60.zip` | 60 | MC2 | `libvulkan_panfrost.so` |
+| `xamonxx_mali7300V0.3-stable60-freedreno.zip` | 60 | MC2 | `libvulkan_freedreno.so` |
 
 ## ⚠️ Catatan
 - **Eksperimental** dan **belum diuji** di G615 MC2. V0.1 dilaporkan force close di launcher GTA V.

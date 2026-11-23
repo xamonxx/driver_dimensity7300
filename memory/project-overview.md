@@ -17,7 +17,8 @@ dipakai di launcher GTA V. Target owner: **FPS 30–60 yang sangat stabil**, suh
 
 - **V0.1 FORCE CLOSE** di launcher GTA V "saat membuka game" (laporan owner 2026-11-24).
 - **V0.2 RILIS** (CI 45226695057): stable30 / safe30 / debug30 / stable60 (+freedreno). Profil MC2 (IR off, heap 10,400),
-  debug30 menulis `Android/media/<pkg>/xamonxx_mali7300_{crash,mesa}.log`. NOT TESTED.
+  debug30 menulis `Android/media/<pkg>/xamonxx_mali7300_{crash,mesa}.log`.
+- **V0.2 Stable30 diuji: force close.** Root cause dari log launcher: swapchain import `data[0]` bukan dma-buf. **V0.3** = fix (patch 0004).
 
 ## Next steps
 1. Owner uji V0.2: stable30, lalu safe30, lalu debug30, dan kirim log crash/mesa bila force close.
