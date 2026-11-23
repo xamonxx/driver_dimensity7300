@@ -68,6 +68,11 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: docs
+
       - uses: actions/download-artifact@v4
         with:
           path: out
@@ -79,12 +84,15 @@ jobs:
         run: |
           ls -l out
           ( cd out && sha256sum *.zip > SHA256SUMS.txt )
+          cp docs/RELEASE_NOTES.md notes.md
+          {
+            echo
+            echo "## 🔐 SHA256"
+            echo '```'
+            cat out/SHA256SUMS.txt
+            echo '```'
+          } >> notes.md
           gh release delete "v${VERSION}" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true
           gh release create "v${VERSION}" out/*.zip out/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "xamonxx mali7300 V${VERSION}" \
-            --notes "Mesa PanVK on mali_kbase for Mali-G615 MC2 (Infinix Note 50X / Dimensity 7300).
-          Base: zenithblue panvk-kbase v26.3.1 series (p0175). Added: precise frame pacer + A78/A55 tuning.
-          - stable30: frame pacer 30 fps (recommended for GTA V)
-          - stable60: frame pacer 60 fps
-          - *-freedreno.zip: same driver named libvulkan_freedreno.so for loaders that require that name
-          Runtime override: XAMONXX_FPS_CAP=0|10..240. EXPERIMENTAL, NOT TESTED on Mali-G615 MC2 yet."
+            --title "⚡ xamonxx mali7300 V${VERSION}: PanVK Mali-G615 MC2" \
+            --notes-file notes.md --latest

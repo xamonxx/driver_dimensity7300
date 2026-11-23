@@ -18,7 +18,7 @@ tanpa root dan tanpa kernel custom. Dilengkapi **frame pacer presisi** untuk FPS
 ![Root](https://img.shields.io/badge/Root-Tidak_perlu-success?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Eksperimental-orange?style=for-the-badge)
 
-[**⬇️ Download**](../../releases/latest) · [**📦 Cara Pasang**](#-cara-pasang) · [**⚙️ Cara Kerja**](#%EF%B8%8F-cara-kerja) · [**🧪 Hasil Audit**](docs/CANDIDATES.md) · [**🛠️ Build**](docs/BUILD.md)
+[**⬇️ Download**](../../releases/latest) · [**🧭 Pilih Driver**](docs/PILIH_DRIVER.md) · [**📦 Cara Pasang**](#-cara-pasang) · [**⚙️ Cara Kerja**](#%EF%B8%8F-cara-kerja) · [**🧪 Hasil Audit**](docs/CANDIDATES.md) · [**🛠️ Build**](docs/BUILD.md)
 
 </div>
 
@@ -63,6 +63,8 @@ Audit lengkap ada di [`docs/DEVICE_INFO.md`](docs/DEVICE_INFO.md).
 
 > [!TIP]
 > Jika launcher juga punya **Target FPS**, angka terendah yang berlaku. Contoh: pakai **stable30** lalu set Target FPS 30 juga.
+
+🧭 **Masih bingung?** Ikuti pohon keputusan di [`docs/PILIH_DRIVER.md`](docs/PILIH_DRIVER.md): aplikasi, lalu driver, lalu command line, lalu resolusi.
 
 ## 🚀 Cara pasang
 
