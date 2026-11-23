@@ -72,7 +72,7 @@ Audit lengkap ada di [`docs/DEVICE_INFO.md`](docs/DEVICE_INFO.md).
 4. Jalankan **Benchmark Runs**, lalu bandingkan hasilnya dengan driver bawaan.
 5. Jika gagal dimuat, coba varian `-freedreno.zip`. Jika masih gagal, kembali ke driver bawaan dengan **Remove a driver**.
 
-Setting game untuk GTA V ada di [`docs/COMMANDLINE.md`](docs/COMMANDLINE.md).
+🎮 **Command line GTA V** (3 profil siap salin, daftar lengkap parameter, dan tabel resolusi) ada di [`docs/COMMANDLINE.md`](docs/COMMANDLINE.md).
 
 ## ⚙️ Cara kerja
 
