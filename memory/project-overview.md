@@ -12,12 +12,12 @@ dipakai di launcher GTA V. Target owner: **FPS 30–60 yang sangat stabil**, suh
 ## Status (2026-11-23)
 - Top 3 kandidat diunduh dan diaudit (semua PASS), lihat `docs/CANDIDATES.md`. Basis: zenithblue v26.3.1.
 - Patch seri rilis (p0175) dan `xamonxx/0001_frame_pacer.py` diuji apply secara lokal: bersih.
-- V0.1: build CI pertama (varian stable30, stable60). Status driver: **NOT TESTED** di HP.
+- **V0.1 RILIS** (CI 45212424366, setelah fix header xcb): release `v0.1` berisi 4 zip + SHA256SUMS.txt. Audit lokal PASS.
+  Catatan rilis memakai `docs/RELEASE_NOTES.md`. Status driver: **NOT TESTED** di HP.
 
 ## Next steps
-1. CI hijau, unduh zip ke `dist/`, lalu audit.
-2. Owner uji sesuai `docs/TESTING.md` (bawaan vs stable30 vs stable60).
-3. V0.2 berdasarkan hasil uji (mis. cap 40/45, atau fallback kandidat #2 JimVulkan bila #1 gagal load).
+1. Owner uji sesuai `docs/TESTING.md` (bawaan vs stable30 vs stable60).
+2. V0.2 berdasarkan hasil uji (mis. cap 40/45, atau fallback kandidat #2 JimVulkan bila #1 gagal load).
 
 ## Lingkungan
 - PC owner Windows 11 tanpa virtualisasi, jadi build lewat GitHub Actions. gh login `xamonxx`.
